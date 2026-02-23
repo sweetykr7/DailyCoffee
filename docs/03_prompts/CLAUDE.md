@@ -92,6 +92,19 @@ Full-stack e-commerce: Next.js frontend + Express/Node.js backend + PostgreSQL +
 3. Docker services start (`docker-compose up`)
 4. Update relevant spec/runbook if you changed something significant
 
+## 🚀 Git Push 규칙
+
+- **기능 단위로 커밋 + push** — 한 번에 다 하지 말고, 완성된 기능마다 바로
+- `git push origin main` 커밋 직후 실행 (post-commit hook이 자동으로 push함)
+- Push 순서 예시:
+  1. `feat(infra): docker-compose` → push
+  2. `feat(backend): prisma schema` → push
+  3. `feat(backend): auth routes` → push
+  4. `feat(backend): product routes` → push
+  5. `feat(frontend): layout components` → push
+  6. `feat(frontend): home page` → push
+  7. ... 계속
+
 ---
 
 ## 🔄 Resuming Work
