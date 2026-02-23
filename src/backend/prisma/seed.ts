@@ -97,6 +97,45 @@ const main = async () => {
   // ────────────────────────────────────────────
   console.log('Creating products...');
 
+  // coffeecg.com CDN 이미지 URLs
+  const IMAGES = {
+    bean: [
+      'https://www.coffeecg.com/web/product/medium/202602/4c5294927eaf7caf13e2f11f648a0bcb.jpg',
+      'https://www.coffeecg.com/web/product/medium/202602/8a1574dd5102def3ab0287ce95f40b71.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/2a3153fe0a3d355c90a3d6d34b536362.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/28393983063aacd8cab33746598786fd.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/1662a7853becb414bd18677cc88c3ff4.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/ffdef0e065231433991e95512619eb4d.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/03f50424f8304a751c1db1d5137a556c.jpg',
+      'https://www.coffeecg.com/web/product/medium/202510/b10fe03f32937ffeda7ea6f1f882de03.jpg',
+    ],
+    stick: [
+      'https://www.coffeecg.com/web/product/medium/202509/91db205b99927b531627bdcd319056fd.jpg',
+      'https://www.coffeecg.com/web/product/medium/202509/214d426e85fd94a6c62898e467bc4bd2.jpg',
+    ],
+    drip: [
+      'https://www.coffeecg.com/web/product/medium/202511/adf4bee53c8c2a1f87540404a13b132e.jpg',
+      'https://www.coffeecg.com/web/product/medium/202511/d91f2a4cea8059d83d87fbf9e57c7657.jpg',
+      'https://www.coffeecg.com/web/product/medium/202509/7841ad251ba06e59806fc9fd1cac9ad7.jpg',
+      'https://www.coffeecg.com/web/product/medium/202509/3f506ff462827f393b73fd0178ca8749.jpg',
+    ],
+    gift: [
+      'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1610889556528-9a770e32642f?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop&q=80',
+    ],
+    equipment: [
+      'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1516743619420-154b70a65fea?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=400&fit=crop&q=80',
+    ],
+  };
+
   interface ProductSeed {
     name: string;
     price: number;
@@ -108,6 +147,7 @@ const main = async () => {
     stock?: number;
     hasWeightOption?: boolean;
     hasGrindOption?: boolean;
+    imageUrl?: string;
   }
 
   const productSeeds: ProductSeed[] = [
@@ -409,6 +449,7 @@ const main = async () => {
   ];
 
   const createdProducts: Record<string, string> = {};
+  const categoryImageCounters: Record<string, number> = {};
 
   for (const seed of productSeeds) {
     const productSlug = slugify(seed.name);
@@ -430,10 +471,30 @@ const main = async () => {
 
     createdProducts[seed.name] = product.id;
 
+    // 카테고리별 이미지 자동 순환 배정
+    const imgIdx = categoryImageCounters[seed.categorySlug] ?? 0;
+    categoryImageCounters[seed.categorySlug] = imgIdx + 1;
+    let imageUrl = seed.imageUrl;
+    if (!imageUrl) {
+      if (seed.categorySlug === 'coffee-beans') {
+        imageUrl = IMAGES.bean[imgIdx % IMAGES.bean.length];
+      } else if (seed.categorySlug === 'stick-coffee') {
+        imageUrl = IMAGES.stick[imgIdx % IMAGES.stick.length];
+      } else if (seed.categorySlug === 'drip-bag') {
+        imageUrl = IMAGES.drip[imgIdx % IMAGES.drip.length];
+      } else if (seed.categorySlug === 'gift-set') {
+        imageUrl = IMAGES.gift[imgIdx % IMAGES.gift.length];
+      } else if (seed.categorySlug === 'home-cafe') {
+        imageUrl = IMAGES.equipment[imgIdx % IMAGES.equipment.length];
+      } else {
+        imageUrl = '/images/products/placeholder.svg';
+      }
+    }
+
     // Create primary image
     await prisma.productImage.create({
       data: {
-        url: '/images/products/placeholder.svg',
+        url: imageUrl,
         alt: seed.name,
         isPrimary: true,
         order: 0,
