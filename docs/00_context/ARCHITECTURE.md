@@ -1,8 +1,8 @@
-# ARCHITECTURE — DailyCoffee
+# 아키텍처 — 데일리커피
 
 ---
 
-## 구성도
+## 전체 구성도
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -28,7 +28,7 @@
 ```
 DailyCoffee/
 ├── docker-compose.yml
-├── docker-compose.dev.yml       # dev override (hot reload)
+├── docker-compose.dev.yml       # 개발용 오버라이드 (핫 리로드)
 ├── .env.example
 │
 ├── src/
@@ -45,61 +45,44 @@ DailyCoffee/
 │   │   │   ├── (auth)/          # 인증 레이아웃 그룹
 │   │   │   │   ├── login/page.tsx
 │   │   │   │   └── register/page.tsx
-│   │   │   ├── mypage/          # 마이페이지 (protected)
+│   │   │   ├── mypage/          # 마이페이지 (보호된 경로)
 │   │   │   │   ├── page.tsx
-│   │   │   │   ├── orders/page.tsx
-│   │   │   │   └── reviews/page.tsx
-│   │   │   ├── admin/           # 관리자 (protected)
-│   │   │   │   ├── page.tsx
-│   │   │   │   ├── products/page.tsx
 │   │   │   │   └── orders/page.tsx
+│   │   │   ├── admin/           # 관리자 (보호된 경로)
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── products/page.tsx
 │   │   │   ├── layout.tsx
 │   │   │   └── globals.css
 │   │   ├── components/
-│   │   │   ├── layout/          # Header, Footer, Nav
-│   │   │   ├── home/            # HeroSlider, CategoryTabs, ProductSection
-│   │   │   ├── product/         # ProductCard, ProductGallery, OptionSelector
-│   │   │   ├── cart/            # CartItem, CartSummary
-│   │   │   ├── order/           # OrderForm, PaymentMock
-│   │   │   ├── review/          # ReviewCard, ReviewForm, StarRating
-│   │   │   └── ui/              # Button, Input, Modal, Badge (공통)
+│   │   │   ├── layout/          # Header, Footer, MobileMenu
+│   │   │   ├── home/            # HeroSlider, CategoryTabs, ProductSection 등
+│   │   │   ├── ui/              # Button, Input, ProductCard, Modal 등 공통 컴포넌트
 │   │   ├── lib/
-│   │   │   ├── api.ts           # API client (fetch wrapper)
-│   │   │   ├── auth.ts          # 클라이언트 auth 헬퍼
+│   │   │   ├── api.ts           # API 클라이언트 (fetch 래퍼)
 │   │   │   └── utils.ts         # 포맷터, 공통 유틸
-│   │   ├── hooks/               # useCart, useAuth, useProducts
-│   │   ├── stores/              # Zustand stores (cart, auth)
+│   │   ├── stores/              # Zustand 스토어 (cart, auth)
 │   │   ├── types/               # TypeScript 타입 정의
-│   │   ├── tailwind.config.ts
-│   │   ├── next.config.ts
 │   │   └── package.json
 │   │
 │   └── backend/                 # Express 5 API
 │       ├── src/
 │       │   ├── routes/          # 라우트 등록
-│       │   │   ├── auth.routes.ts
-│       │   │   ├── product.routes.ts
-│       │   │   ├── cart.routes.ts
-│       │   │   ├── order.routes.ts
-│       │   │   ├── review.routes.ts
-│       │   │   └── admin.routes.ts
 │       │   ├── controllers/     # req/res 처리
 │       │   ├── services/        # 비즈니스 로직
 │       │   ├── middleware/
 │       │   │   ├── auth.ts      # JWT 검증
 │       │   │   ├── admin.ts     # 관리자 권한
-│       │   │   ├── validate.ts  # Zod 유효성
+│       │   │   ├── validate.ts  # Zod 유효성 검사
 │       │   │   └── errorHandler.ts
 │       │   ├── lib/
 │       │   │   ├── prisma.ts    # Prisma 싱글톤
 │       │   │   ├── jwt.ts       # 토큰 발급/검증
 │       │   │   └── logger.ts    # Winston 로거
-│       │   └── app.ts           # Express 앱 설정
+│       │   └── app.ts
 │       ├── prisma/
 │       │   ├── schema.prisma    # DB 스키마
 │       │   ├── migrations/
 │       │   └── seed.ts          # 초기 데이터
-│       ├── Dockerfile
 │       └── package.json
 │
 └── docs/
@@ -109,11 +92,12 @@ DailyCoffee/
 
 ## API 엔드포인트 요약
 
-| Method | Path | 설명 |
+| 메서드 | 경로 | 설명 |
 |--------|------|------|
 | POST | `/api/auth/register` | 회원가입 |
 | POST | `/api/auth/login` | 로그인 |
 | POST | `/api/auth/refresh` | 토큰 갱신 |
+| GET | `/api/auth/me` | 내 정보 조회 |
 | GET | `/api/products` | 상품 목록 (필터/정렬/페이지) |
 | GET | `/api/products/:id` | 상품 상세 |
 | GET | `/api/categories` | 카테고리 목록 |
@@ -126,8 +110,6 @@ DailyCoffee/
 | GET | `/api/orders/:id` | 주문 상세 |
 | POST | `/api/reviews` | 리뷰 작성 |
 | GET | `/api/reviews?productId=` | 상품 리뷰 목록 |
-| GET | `/api/admin/products` | 관리자: 상품 관리 |
-| POST | `/api/admin/products` | 관리자: 상품 등록 |
 
 ---
 
@@ -150,10 +132,10 @@ Product — ProductOption (용량, 분쇄도)
 ## 인증 흐름
 
 ```
-로그인 → JWT accessToken(15m) + refreshToken(7d) 발급
+로그인 → JWT 액세스토큰(15분) + 리프레시토큰(7일) 발급
 요청 시 → Authorization: Bearer <accessToken>
-만료 시 → POST /api/auth/refresh → 새 accessToken 발급
-프론트 → Zustand에 user 상태 저장, localStorage에 refreshToken
+만료 시 → POST /api/auth/refresh → 새 액세스토큰 발급
+프론트 → Zustand에 사용자 상태 저장, localStorage에 리프레시토큰
 ```
 
 ---
@@ -161,14 +143,14 @@ Product — ProductOption (용량, 분쇄도)
 ## 환경변수 (`.env.example` 기준)
 
 ```env
-# Database
+# 데이터베이스
 DATABASE_URL=postgresql://dailycoffee:dailycoffee@db:5432/dailycoffee
 
-# Auth
+# 인증
 JWT_SECRET=your-super-secret-key
 JWT_REFRESH_SECRET=your-refresh-secret-key
 
-# App
+# 앱 설정
 BACKEND_URL=http://backend:4000
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 NODE_ENV=development

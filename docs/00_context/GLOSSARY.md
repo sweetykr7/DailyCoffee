@@ -1,4 +1,4 @@
-# GLOSSARY — DailyCoffee
+# 용어집 — 데일리커피
 
 > 용어 통일. 코드/UI/DB 모두 이 이름 사용.
 
@@ -16,7 +16,7 @@
 
 ## 도메인 용어
 
-| 한국어 | 영어 | 코드 변수명 | DB 컬럼 |
+| 한국어 | 영어 | 코드 변수명 | DB 테이블 |
 |--------|------|------------|---------|
 | 상품 | Product | `product` | `products` |
 | 카테고리 | Category | `category` | `categories` |
