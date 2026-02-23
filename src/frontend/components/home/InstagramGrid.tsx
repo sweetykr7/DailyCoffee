@@ -1,30 +1,38 @@
+import React from 'react';
 import { Instagram } from 'lucide-react';
 
-const PLACEHOLDER_IMAGES = Array.from({ length: 6 }, (_, i) => ({
-  id: i + 1,
-  color: i % 2 === 0 ? 'bg-coffee-light/20' : 'bg-accent/20',
-}));
+const PLACEHOLDER_IMAGES = [
+  { id: 1, color: 'bg-[#d4a574]' },
+  { id: 2, color: 'bg-[#8b6651]' },
+  { id: 3, color: 'bg-[#c4924a]' },
+  { id: 4, color: 'bg-[#e8ddd0]' },
+  { id: 5, color: 'bg-[#3d2b1f]' },
+  { id: 6, color: 'bg-[#a87a3a]' },
+];
 
 export function InstagramGrid() {
   return (
-    <section className="py-12">
-      <div className="container-custom text-center">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <Instagram className="h-5 w-5 text-accent" />
-          <h2 className="font-display text-xl font-bold text-coffee">
-            @dailycoffee_official
-          </h2>
+    <section className="py-12 md:py-16">
+      <div className="container-custom">
+        <div className="mb-8 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <Instagram className="h-5 w-5 text-accent" />
+            <p className="font-display text-sm font-medium uppercase tracking-wider text-accent">
+              @dailycoffee_official
+            </p>
+          </div>
+          <h2 className="text-2xl font-bold text-coffee md:text-3xl">Instagram</h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-6 md:gap-3">
           {PLACEHOLDER_IMAGES.map((img) => (
             <div
               key={img.id}
-              className={`aspect-square rounded-lg ${img.color} flex items-center justify-center transition-opacity hover:opacity-80 cursor-pointer`}
+              className={`group relative aspect-square cursor-pointer overflow-hidden rounded-lg ${img.color}`}
             >
-              <svg className="h-8 w-8 text-coffee/20" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.5 3H6c-1.1 0-2 .9-2 2v5.71c0 3.83 2.95 7.18 6.78 7.29 3.96.12 7.22-3.06 7.22-7v-6a2 2 0 00-2-2zm-9 14c-2.79 0-5-2.24-5-5V5h12v7c0 2.79-2.24 5.01-5 5.01L9.5 17zM20 6h2v8h-2V6z" />
-              </svg>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                <Instagram className="h-8 w-8 text-white" />
+              </div>
             </div>
           ))}
         </div>

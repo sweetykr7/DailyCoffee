@@ -1,78 +1,149 @@
 'use client';
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const SLIDES = [
+interface Slide {
+  id: number;
+  title: string;
+  subtitle: string;
+  cta: string;
+  href: string;
+  bgClass: string;
+  textClass: string;
+}
+
+const SLIDES: Slide[] = [
   {
     id: 1,
-    title: '매일 신선한 원두',
-    subtitle: '산지에서 직접 로스팅한 프리미엄 커피',
-    cta: '원두 보러가기',
-    href: '/products?category=coffee-beans',
-    bg: 'from-coffee-dark to-coffee',
+    title: '2월 특별 이벤트',
+    subtitle: '발렌타인데이 맞이\n커피 선물세트 최대 30% 할인',
+    cta: '이벤트 보기',
+    href: '/products?tag=event',
+    bgClass: 'bg-cream-warm',
+    textClass: 'text-coffee',
   },
   {
     id: 2,
-    title: '간편한 스틱커피',
-    subtitle: '언제 어디서나 프리미엄 커피 한 잔',
-    cta: '스틱커피 보기',
-    href: '/products?category=stick-coffee',
-    bg: 'from-coffee to-coffee-light',
+    title: '신규 스페셜티 원두',
+    subtitle: '에티오피아 예가체프 G1\n싱글 오리진의 깊은 풍미',
+    cta: '상품 보기',
+    href: '/products?tag=new',
+    bgClass: 'bg-coffee-dark',
+    textClass: 'text-cream',
   },
   {
     id: 3,
-    title: '홈카페 시작하기',
-    subtitle: '집에서 즐기는 바리스타 커피',
-    cta: '홈카페 용품',
-    href: '/products?category=home-cafe',
-    bg: 'from-accent-dark to-accent',
+    title: '스틱커피 특가',
+    subtitle: '바쁜 아침에도 간편하게\n프리미엄 스틱커피 1+1',
+    cta: '바로가기',
+    href: '/products?category=stick-coffee',
+    bgClass: 'bg-[#e8ddd0]',
+    textClass: 'text-coffee',
   },
 ];
 
 export function HeroSlider() {
+  const [current, setCurrent] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoplay = () => {
+    intervalRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % SLIDES.length);
+    }, 4500);
+  };
+
+  const stopAutoplay = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+  };
+
+  useEffect(() => {
+    startAutoplay();
+    return stopAutoplay;
+  }, []);
+
+  const goTo = (index: number) => {
+    stopAutoplay();
+    setCurrent(index);
+    startAutoplay();
+  };
+
+  const prev = () => goTo((current - 1 + SLIDES.length) % SLIDES.length);
+  const next = () => goTo((current + 1) % SLIDES.length);
+
+  const slide = SLIDES[current];
+
   return (
-    <section className="relative">
-      <Swiper
-        modules={[Autoplay, Pagination, Navigation]}
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        pagination={{ clickable: true }}
-        navigation
-        loop
-        className="h-[400px] sm:h-[480px] lg:h-[560px]"
+    <section className="relative overflow-hidden">
+      <div
+        className={cn(
+          'flex min-h-[400px] items-center transition-colors duration-700 sm:min-h-[480px] lg:min-h-[560px]',
+          slide.bgClass
+        )}
       >
-        {SLIDES.map((slide) => (
-          <SwiperSlide key={slide.id}>
-            <div
-              className={`flex h-full w-full items-center bg-gradient-to-r ${slide.bg}`}
+        <div className="container-custom relative z-10 py-16">
+          <div className="max-w-lg">
+            <p className="mb-2 font-display text-sm font-medium uppercase tracking-widest text-accent">
+              DAILY COFFEE
+            </p>
+            <h2
+              className={cn(
+                'font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl',
+                slide.textClass
+              )}
             >
-              <div className="container-custom">
-                <div className="max-w-lg text-white">
-                  <p className="mb-2 text-sm font-medium uppercase tracking-widest text-white/70">
-                    DAILY COFFEE
-                  </p>
-                  <h2 className="mb-4 font-display text-4xl font-bold sm:text-5xl lg:text-6xl">
-                    {slide.title}
-                  </h2>
-                  <p className="mb-8 text-lg text-white/80">
-                    {slide.subtitle}
-                  </p>
-                  <Link
-                    href={slide.href}
-                    className="inline-block rounded-md bg-white px-8 py-3 text-sm font-semibold text-coffee transition-colors hover:bg-cream-warm"
-                  >
-                    {slide.cta}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </SwiperSlide>
+              {slide.title}
+            </h2>
+            <p
+              className={cn(
+                'mt-4 whitespace-pre-line text-base md:text-lg',
+                slide.textClass === 'text-cream' ? 'text-cream/70' : 'text-sub'
+              )}
+            >
+              {slide.subtitle}
+            </p>
+            <Link
+              href={slide.href}
+              className="mt-6 inline-block rounded-md bg-accent px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-dark"
+            >
+              {slide.cta}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Nav arrows */}
+      <button
+        onClick={prev}
+        className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/80 p-2 text-coffee shadow-md hover:bg-white transition-colors"
+        aria-label="이전"
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        onClick={next}
+        className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/80 p-2 text-coffee shadow-md hover:bg-white transition-colors"
+        aria-label="다음"
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+        {SLIDES.map((s, i) => (
+          <button
+            key={s.id}
+            onClick={() => goTo(i)}
+            className={cn(
+              'h-2 rounded-full transition-all duration-300',
+              current === i ? 'w-6 bg-accent' : 'w-2 bg-coffee/30'
+            )}
+            aria-label={`슬라이드 ${i + 1}`}
+          />
         ))}
-      </Swiper>
+      </div>
     </section>
   );
 }

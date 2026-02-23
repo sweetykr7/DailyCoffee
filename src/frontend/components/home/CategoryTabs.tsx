@@ -1,42 +1,66 @@
 'use client';
 
+import React, { useRef } from 'react';
 import Link from 'next/link';
-import { Coffee, Package, Gift, Droplets, Home } from 'lucide-react';
-import type { Category } from '@/types';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface CategoryTabsProps {
-  categories: Category[];
-}
+const CATEGORIES = [
+  { label: '전체', slug: '' },
+  { label: '원두 200g', slug: 'beans-200' },
+  { label: '원두 400g', slug: 'beans-400' },
+  { label: '원두 1kg', slug: 'beans-1kg' },
+  { label: '분쇄원두', slug: 'ground' },
+  { label: '캡슐커피', slug: 'capsule' },
+  { label: '스틱커피', slug: 'stick-coffee' },
+  { label: '패키지', slug: 'package' },
+  { label: '선물하기', slug: 'gifts' },
+  { label: '굿즈', slug: 'goods' },
+];
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'coffee-beans': <Coffee className="h-6 w-6" />,
-  'stick-coffee': <Droplets className="h-6 w-6" />,
-  'drip-bag': <Package className="h-6 w-6" />,
-  'home-cafe': <Home className="h-6 w-6" />,
-  'gift': <Gift className="h-6 w-6" />,
-};
+export function CategoryTabs() {
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-export function CategoryTabs({ categories }: CategoryTabsProps) {
+  const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollBy({
+      left: direction === 'left' ? -200 : 200,
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <section className="py-12">
-      <div className="container-custom">
-        <div className="grid grid-cols-3 gap-4 sm:grid-cols-5 lg:gap-6">
-          {categories.map((cat) => (
+    <section className="border-b border-gray-100 bg-white">
+      <div className="container-custom relative">
+        <button
+          onClick={() => scroll('left')}
+          className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-1 shadow-md text-coffee hover:bg-cream-warm transition-colors lg:hidden"
+          aria-label="스크롤 왼쪽"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-hide lg:justify-center lg:gap-2"
+        >
+          {CATEGORIES.map((cat) => (
             <Link
-              key={cat.id}
-              href={`/products?categoryId=${cat.id}`}
-              className="group flex flex-col items-center gap-3 rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+              key={cat.slug || 'all'}
+              href={cat.slug ? `/products?category=${cat.slug}` : '/products'}
+              className="shrink-0 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-coffee transition-colors hover:border-accent hover:bg-accent hover:text-white"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-cream-warm text-coffee-light transition-colors group-hover:bg-accent group-hover:text-white">
-                {CATEGORY_ICONS[cat.slug] || <Coffee className="h-6 w-6" />}
-              </div>
-              <span className="text-sm font-medium text-coffee">{cat.name}</span>
-              {cat._count && (
-                <span className="text-xs text-sub">{cat._count.products}개 상품</span>
-              )}
+              {cat.label}
             </Link>
           ))}
         </div>
+
+        <button
+          onClick={() => scroll('right')}
+          className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-1 shadow-md text-coffee hover:bg-cream-warm transition-colors lg:hidden"
+          aria-label="스크롤 오른쪽"
+        >
+          <ChevronRight size={16} />
+        </button>
       </div>
     </section>
   );
