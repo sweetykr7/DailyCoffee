@@ -6,9 +6,9 @@ services:
       context: ./src/frontend
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - '3001:3000'
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:4000/api
+      - NEXT_PUBLIC_API_URL=http://localhost:4001/api
     depends_on:
       - backend
 
@@ -17,7 +17,7 @@ services:
       context: ./src/backend
       dockerfile: Dockerfile
     ports:
-      - '4000:4000'
+      - '4001:4000'
     environment:
       - DATABASE_URL=postgresql://dailycoffee:dailycoffee@db:5432/dailycoffee
       - JWT_SECRET=dailycoffee-jwt-secret-key-2024
@@ -30,7 +30,7 @@ services:
   db:
     image: postgres:16
     ports:
-      - '5432:5432'
+      - '5433:5432'
     environment:
       - POSTGRES_DB=dailycoffee
       - POSTGRES_USER=dailycoffee

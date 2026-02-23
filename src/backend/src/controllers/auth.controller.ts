@@ -12,7 +12,8 @@ export async function register(
   next: NextFunction
 ): Promise<void> {
   try {
-    const user = await authService.register(req.body);
+    const { email, password, name, phone } = req.body;
+    const user = await authService.register(email, password, name, phone);
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user.id, role: user.role });
 
@@ -31,7 +32,8 @@ export async function login(
   next: NextFunction
 ): Promise<void> {
   try {
-    const user = await authService.login(req.body);
+    const { email, password } = req.body;
+    const user = await authService.login(email, password);
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user.id, role: user.role });
 

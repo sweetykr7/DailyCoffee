@@ -18,25 +18,17 @@ export async function getCategories(
   }
 }
 
-export async function getCategoryProducts(
+export async function getCategoryBySlug(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    const products = await categoryService.getCategoryProducts(req.params.slug);
-
-    if (!products) {
-      res.status(404).json({
-        success: false,
-        error: 'Category not found.',
-      });
-      return;
-    }
+    const category = await categoryService.getCategoryBySlug(req.params.slug);
 
     res.json({
       success: true,
-      data: products,
+      data: category,
     });
   } catch (error) {
     next(error);

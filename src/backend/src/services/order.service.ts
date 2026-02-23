@@ -1,11 +1,12 @@
 import prisma from '../lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const FREE_SHIPPING_THRESHOLD = 30000;
 const SHIPPING_FEE = 3000;
 
 export const createOrder = async (
   userId: string,
-  shippingAddress: Record<string, unknown>,
+  shippingAddress: Prisma.InputJsonValue,
   paymentMethod: string,
 ) => {
   const cart = await prisma.cart.findUnique({
@@ -42,7 +43,7 @@ export const createOrder = async (
           productId: item.productId,
           quantity: item.quantity,
           price: item.product.discountPrice ?? item.product.price,
-          selectedOptions: item.selectedOptions ?? undefined,
+          selectedOptions: (item.selectedOptions as Prisma.InputJsonValue) ?? Prisma.JsonNull,
         })),
       },
     },

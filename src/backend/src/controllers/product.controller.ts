@@ -18,7 +18,7 @@ export async function getProducts(
     const result = await productService.getProducts({
       categoryId: categoryId as string | undefined,
       search: search as string | undefined,
-      sort: sort as string | undefined,
+      sort: sort as 'latest' | 'price_asc' | 'price_desc' | 'popular' | undefined,
       page: Number(page),
       limit: Number(limit),
     });

@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const cartInclude = {
   items: {
@@ -38,7 +39,7 @@ export const addItem = async (
   userId: string,
   productId: string,
   quantity: number,
-  selectedOptions?: Record<string, unknown>,
+  selectedOptions?: Prisma.InputJsonValue,
 ) => {
   const cart = await findOrCreateCart(userId);
 
@@ -60,7 +61,7 @@ export const addItem = async (
         cartId: cart.id,
         productId,
         quantity,
-        selectedOptions: selectedOptions ?? undefined,
+        selectedOptions: selectedOptions ?? Prisma.JsonNull,
       },
     });
   }

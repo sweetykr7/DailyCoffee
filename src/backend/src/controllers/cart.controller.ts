@@ -25,11 +25,7 @@ export async function addItem(
 ): Promise<void> {
   try {
     const { productId, quantity, selectedOptions } = req.body;
-    const cart = await cartService.addItem(req.user!.userId, {
-      productId,
-      quantity,
-      selectedOptions,
-    });
+    const cart = await cartService.addItem(req.user!.userId, productId, quantity, selectedOptions);
 
     res.status(201).json({
       success: true,
@@ -48,9 +44,9 @@ export async function updateItem(
   try {
     const { quantity } = req.body;
     const cart = await cartService.updateItem(
-      req.user!.userId,
       req.params.itemId,
-      { quantity }
+      req.user!.userId,
+      quantity
     );
 
     res.json({
@@ -69,8 +65,8 @@ export async function removeItem(
 ): Promise<void> {
   try {
     const cart = await cartService.removeItem(
-      req.user!.userId,
-      req.params.itemId
+      req.params.itemId,
+      req.user!.userId
     );
 
     res.json({

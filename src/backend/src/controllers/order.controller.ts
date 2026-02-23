@@ -8,10 +8,7 @@ export async function createOrder(
 ): Promise<void> {
   try {
     const { shippingAddress, paymentMethod } = req.body;
-    const order = await orderService.createOrder(req.user!.userId, {
-      shippingAddress,
-      paymentMethod,
-    });
+    const order = await orderService.createOrder(req.user!.userId, shippingAddress, paymentMethod);
 
     res.status(201).json({
       success: true,

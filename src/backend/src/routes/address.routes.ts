@@ -35,7 +35,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const addresses = await prisma.address.findMany({
       where: { userId: req.user!.userId },
-      orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ isDefault: 'desc' }, { id: 'desc' }],
     });
 
     res.json({ success: true, data: addresses });

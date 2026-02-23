@@ -8,13 +8,7 @@ export async function createReview(
 ): Promise<void> {
   try {
     const { productId, rating, content, images, orderId } = req.body;
-    const review = await reviewService.createReview(req.user!.userId, {
-      productId,
-      rating,
-      content,
-      images,
-      orderId,
-    });
+    const review = await reviewService.createReview(req.user!.userId, productId, rating, content, images, orderId);
 
     res.status(201).json({
       success: true,
@@ -58,10 +52,7 @@ export async function likeReview(
   next: NextFunction
 ): Promise<void> {
   try {
-    const review = await reviewService.likeReview(
-      req.params.id,
-      req.user!.userId
-    );
+    const review = await reviewService.likeReview(req.params.id);
 
     res.json({
       success: true,
