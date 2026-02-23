@@ -1,5 +1,7 @@
 FROM node:20-alpine AS builder
 
+RUN apk add --no-cache openssl libc6-compat
+
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
@@ -13,6 +15,8 @@ RUN pnpm prisma generate
 RUN pnpm build
 
 FROM node:20-alpine AS runner
+
+RUN apk add --no-cache openssl libc6-compat
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 

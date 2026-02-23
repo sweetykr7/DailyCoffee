@@ -5,10 +5,12 @@ services:
     build:
       context: ./src/frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5002/api
     ports:
       - '5001:3000'
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:5002/api
+      - NODE_ENV=production
     depends_on:
       - backend
 
