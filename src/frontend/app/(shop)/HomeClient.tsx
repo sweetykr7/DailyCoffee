@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import type { Product, Category, Review } from '@/types';
+import type { Product, Review } from '@/types';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { CategoryTabs } from '@/components/home/CategoryTabs';
 import { ProductSection } from '@/components/home/ProductSection';
@@ -13,35 +13,42 @@ import { InstagramGrid } from '@/components/home/InstagramGrid';
 import { Spinner } from '@/components/ui/Spinner';
 
 export function HomeClient() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [newProducts, setNewProducts] = useState<Product[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [stickProducts, setStickProducts] = useState<Product[]>([]);
+  const [baristaProducts, setBaristaProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [productsRes, categoriesRes, reviewsRes] = await Promise.all([
-          api.get<Product[]>('/products/featured'),
-          api.get<Category[]>('/categories'),
-          api.get<{ data: Review[]; meta: unknown }>('/reviews', { limit: '6' }),
+        const [newRes, recommendedRes, stickRes, baristaRes, reviewsRes] = await Promise.allSettled([
+          api.get<Product[]>('/products', { sort: 'newest', limit: '8' }),
+          api.get<Product[]>('/products', { tag: 'recommended', limit: '4' }),
+          api.get<Product[]>('/products', { category: 'stick-coffee', limit: '4' }),
+          api.get<Product[]>('/products', { tag: 'barista-pick', limit: '4' }),
+          api.get<Review[]>('/reviews', { limit: '3', sort: 'likes' }),
         ]);
 
-        if (productsRes.success && productsRes.data) {
-          setFeaturedProducts(productsRes.data);
+        if (newRes.status === 'fulfilled' && newRes.value.success && newRes.value.data) {
+          setNewProducts(Array.isArray(newRes.value.data) ? newRes.value.data : []);
         }
-        if (categoriesRes.success && categoriesRes.data) {
-          setCategories(categoriesRes.data);
+        if (recommendedRes.status === 'fulfilled' && recommendedRes.value.success && recommendedRes.value.data) {
+          setRecommendedProducts(Array.isArray(recommendedRes.value.data) ? recommendedRes.value.data : []);
         }
-        if (reviewsRes.success && reviewsRes.data) {
-          // reviews endpoint returns paginated - data might be nested
-          const reviewData = Array.isArray(reviewsRes.data)
-            ? reviewsRes.data
-            : (reviewsRes.data as unknown as { data: Review[] }).data || [];
-          setReviews(reviewData);
+        if (stickRes.status === 'fulfilled' && stickRes.value.success && stickRes.value.data) {
+          setStickProducts(Array.isArray(stickRes.value.data) ? stickRes.value.data : []);
+        }
+        if (baristaRes.status === 'fulfilled' && baristaRes.value.success && baristaRes.value.data) {
+          setBaristaProducts(Array.isArray(baristaRes.value.data) ? baristaRes.value.data : []);
+        }
+        if (reviewsRes.status === 'fulfilled' && reviewsRes.value.success && reviewsRes.value.data) {
+          const reviewData = reviewsRes.value.data;
+          setReviews(Array.isArray(reviewData) ? reviewData : []);
         }
       } catch {
-        // API not available, show empty state
+        // API not available — show empty state
       } finally {
         setLoading(false);
       }
@@ -61,16 +68,43 @@ export function HomeClient() {
   return (
     <>
       <HeroSlider />
-      {categories.length > 0 && <CategoryTabs categories={categories} />}
-      <PromoBanners />
+      <CategoryTabs />
+
       <ProductSection
-        title="인기 상품"
-        subtitle="가장 사랑받는 데일리커피 베스트셀러"
-        products={featuredProducts.slice(0, 8)}
-        href="/products"
+        title="신상품"
+        subtitle="새롭게 입고된 프리미엄 원두"
+        products={newProducts}
+        viewAllHref="/products?sort=newest"
       />
+
+      <ProductSection
+        title="이 커피 한 잔 어때요?"
+        subtitle="에디터 추천 커피"
+        products={recommendedProducts}
+        viewAllHref="/products?tag=recommended"
+        columns={2}
+      />
+
+      <PromoBanners />
+
+      <ProductSection
+        title="매일 1박세"
+        subtitle="간편하게 즐기는 스틱커피"
+        products={stickProducts}
+        viewAllHref="/products?category=stick-coffee"
+        columns={2}
+      />
+
+      <ProductSection
+        title="바리스타 추천"
+        subtitle="전문 바리스타가 엄선한 원두"
+        products={baristaProducts}
+        viewAllHref="/products?tag=barista-pick"
+        columns={2}
+      />
+
+      <ReviewSection reviews={reviews} />
       <BrandSection />
-      {reviews.length > 0 && <ReviewSection reviews={reviews} />}
       <InstagramGrid />
     </>
   );
