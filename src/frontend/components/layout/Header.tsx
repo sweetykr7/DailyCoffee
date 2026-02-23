@@ -48,6 +48,14 @@ export function Header() {
             {isLoggedIn ? (
               <>
                 <span className="hidden sm:inline">{user?.name}님 환영합니다</span>
+                {user?.role === 'ADMIN' && (
+                  <Link
+                    href="/admin"
+                    className="rounded bg-coffee px-2 py-0.5 text-white hover:bg-coffee/80 transition-colors font-medium"
+                  >
+                    관리자
+                  </Link>
+                )}
                 <Link href="/mypage" className="hover:text-coffee transition-colors">마이페이지</Link>
                 <button
                   onClick={() => useAuthStore.getState().logout()}
