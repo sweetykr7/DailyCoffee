@@ -7,7 +7,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Ticket } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface Coupon {
   id: string;
@@ -193,8 +194,8 @@ export default function AdminCouponsPage() {
             ))}
             {coupons.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-sub">
-                  쿠폰이 없습니다.
+                <td colSpan={6}>
+                  <EmptyState icon={Ticket} title="아직 쿠폰이 없습니다" description="새 쿠폰을 생성해보세요" />
                 </td>
               </tr>
             )}

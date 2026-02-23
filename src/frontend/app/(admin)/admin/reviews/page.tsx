@@ -5,7 +5,8 @@ import { api } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { Spinner } from '@/components/ui/Spinner';
 import { Pagination } from '@/components/ui/Pagination';
-import { Trash2, Star } from 'lucide-react';
+import { Trash2, Star, MessageSquare } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface AdminReview {
   id: string;
@@ -103,8 +104,8 @@ export default function AdminReviewsPage() {
               ))}
               {reviews.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-sub">
-                    리뷰가 없습니다.
+                  <td colSpan={6}>
+                    <EmptyState icon={MessageSquare} title="아직 리뷰가 없습니다" description="고객 리뷰가 작성되면 여기에 표시됩니다" />
                   </td>
                 </tr>
               )}

@@ -8,7 +8,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Pagination } from '@/components/ui/Pagination';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 import type { Product, Category } from '@/types';
 
 export default function AdminProductsPage() {
@@ -164,8 +165,8 @@ export default function AdminProductsPage() {
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-sub">
-                    상품이 없습니다.
+                  <td colSpan={7}>
+                    <EmptyState icon={Package} title="아직 등록된 상품이 없습니다" description="새 상품을 등록해보세요" />
                   </td>
                 </tr>
               )}

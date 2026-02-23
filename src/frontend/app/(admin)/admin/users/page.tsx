@@ -8,7 +8,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Pagination } from '@/components/ui/Pagination';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Search } from 'lucide-react';
+import { Search, Users } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface AdminUser {
   id: string;
@@ -120,8 +121,8 @@ export default function AdminUsersPage() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-sub">
-                    사용자가 없습니다.
+                  <td colSpan={5}>
+                    <EmptyState icon={Users} title="등록된 사용자가 없습니다" />
                   </td>
                 </tr>
               )}

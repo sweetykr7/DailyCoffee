@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Plus, Pencil, Trash2, FolderTree } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface AdminCategory {
   id: string;
@@ -147,7 +148,9 @@ export default function AdminCategoriesPage() {
           </div>
         ))}
         {categories.length === 0 && (
-          <p className="col-span-full py-12 text-center text-sub">카테고리가 없습니다.</p>
+          <div className="col-span-full">
+            <EmptyState icon={FolderTree} title="아직 카테고리가 없습니다" description="카테고리를 추가해보세요" />
+          </div>
         )}
       </div>
 

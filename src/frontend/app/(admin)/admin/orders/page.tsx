@@ -8,7 +8,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Pagination } from '@/components/ui/Pagination';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Search } from 'lucide-react';
+import { Search, ShoppingCart } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 import type { Order } from '@/types';
 
 const statusList = [
@@ -155,8 +156,8 @@ export default function AdminOrdersPage() {
               ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-sub">
-                    주문이 없습니다.
+                  <td colSpan={5}>
+                    <EmptyState icon={ShoppingCart} title="아직 주문이 없습니다" description="주문이 들어오면 여기에 표시됩니다" />
                   </td>
                 </tr>
               )}
