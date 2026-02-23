@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import type { Category, Product } from '@/types';
 
 export default function AdminProductNewPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,8 +29,14 @@ export default function AdminProductNewPage() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await api.get<Category[]>('/admin/categories');
-      if (res.success && res.data) setCategories(res.data);
+      try {
+        const res = await api.get<Category[]>('/admin/categories');
+        if (res.success && res.data) setCategories(res.data);
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCategories();
   }, []);
@@ -70,6 +78,14 @@ export default function AdminProductNewPage() {
       tags: prev.tags.includes(tag) ? prev.tags.filter((t) => t !== tag) : [...prev.tags, tag],
     }));
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl">
