@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
-const BASE_URL = 'http://localhost:3002';
-const API_URL = 'http://localhost:4001/api';
+const BASE_URL = 'http://localhost:5001';
+const API_URL = 'http://localhost:5002/api';
 
 test.describe('데일리커피 홈페이지', () => {
   test('홈페이지 로딩 및 브랜드명 확인', async ({ page }) => {
