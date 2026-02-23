@@ -163,7 +163,13 @@ export default function AdminProductNewPage() {
 
           {form.imageUrl && (
             <div className="mt-2">
-              <img src={form.imageUrl} alt="미리보기" className="h-32 w-32 rounded-lg object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+              <p className="mb-1 text-xs text-sub">미리보기</p>
+              <img
+                src={form.imageUrl}
+                alt="미리보기"
+                className="h-32 w-32 rounded-lg border border-gray-200 object-cover"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
             </div>
           )}
 
