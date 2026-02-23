@@ -20,7 +20,10 @@ const config: Config = {
         },
         accent: {
           DEFAULT: '#c4924a',
+          light: '#d4a86a',
+          dark: '#a87a3a',
         },
+        sub: '#7a6a60',
       },
       fontFamily: {
         sans: [
@@ -31,6 +34,8 @@ const config: Config = {
           'Roboto',
           'sans-serif',
         ],
+        display: ['Jost', 'Pretendard', 'sans-serif'],
+        serif: ['Lora', 'Georgia', 'serif'],
       },
     },
   },
