@@ -1,58 +1,152 @@
-# 로컬 개발 환경 — 데일리커피
+# 로컬 개발 환경 런북
 
-## 필요 환경
-- Docker Desktop (최신)
+## 사전 요구사항
+- Docker Desktop (Mac/Windows) 또는 Docker Engine (Linux)
 - Node.js 20+
-- pnpm (`npm i -g pnpm`)
+- pnpm (`npm install -g pnpm`)
+- Git
 
-## 최초 세팅
+---
 
-```bash
-# 1. 환경변수 복사
-cp .env.example .env
-
-# 2. Docker 빌드 + 실행
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
-
-# 3. DB 마이그레이션 (컨테이너 내부)
-docker-compose exec backend pnpm prisma migrate dev
-
-# 4. 시드 데이터 (초기 상품/회원 데이터)
-docker-compose exec backend pnpm prisma db seed
-```
-
-## 접속 주소
-
-| 서비스 | 주소 |
-|--------|-----|
-| 프론트엔드 | http://localhost:3000 |
-| 백엔드 API | http://localhost:4000/api |
-| DB 직접 접속 | localhost:5432 / 아이디: dailycoffee / 비번: dailycoffee |
-
-## 자주 쓰는 명령어
+## 1. 빠른 시작 (Docker Compose)
 
 ```bash
-# 전체 재시작
-docker-compose down && docker-compose up
+git clone https://github.com/sweetykr7/DailyCoffee.git
+cd DailyCoffee
 
-# 로그 보기
-docker-compose logs -f frontend
-docker-compose logs -f backend
+# 전체 실행 (빌드 포함)
+docker compose up --build -d
 
-# 백엔드 쉘 접속
-docker-compose exec backend sh
+# DB 스키마 적용
+docker compose exec backend npx prisma db push
 
-# DB 직접 접속
-docker-compose exec db psql -U dailycoffee -d dailycoffee
-
-# Prisma Studio (DB GUI 브라우저)
-docker-compose exec backend pnpm prisma studio
+# 시드 데이터 투입
+docker compose exec backend npx ts-node prisma/seed.ts
 ```
 
-## 개발 모드 (핫 리로드)
-- **프론트엔드**: `src/frontend` 변경 시 자동 반영 (볼륨 마운트)
-- **백엔드**: `src/backend/src` 변경 시 자동 반영 (nodemon)
+접속:
+- 쇼핑몰: http://localhost:5001
+- API: http://localhost:5002/api
+- 어드민: http://localhost:5001/admin (admin@dailycoffee.co.kr / admin1234)
 
-## 기본 계정 (시드 데이터)
-- 관리자: `admin@dailycoffee.co.kr` / `admin1234`
-- 테스트 일반 회원: `test@dailycoffee.co.kr` / `test1234`
+---
+
+## 2. 포트 구성
+
+| 서비스 | 컨테이너 내부 | 호스트 노출 |
+|--------|--------------|------------|
+| 프론트엔드 (Next.js) | 3000 | **5001** |
+| 백엔드 (Express) | 4000 | **5002** |
+| PostgreSQL | 5432 | **5433** |
+
+> ⚠️ 포트 3000, 4000, 5432가 이미 다른 프로세스에 점유된 경우를 위해 다른 포트 사용
+
+---
+
+## 3. 컨테이너 관리
+
+```bash
+# 상태 확인
+docker compose ps
+
+# 로그
+docker compose logs -f          # 전체
+docker compose logs -f backend  # 백엔드만
+docker compose logs -f frontend # 프론트엔드만
+
+# 재시작
+docker compose restart backend
+
+# 코드 변경 후 재빌드
+docker compose up --build -d backend   # 백엔드만
+docker compose up --build -d frontend  # 프론트엔드만
+docker compose up --build -d           # 전체
+
+# 종료
+docker compose down
+```
+
+---
+
+## 4. 백엔드 직접 개발
+
+```bash
+cd src/backend
+
+# 의존성 설치
+pnpm install
+
+# 환경 변수
+cp ../../.env.example .env
+# DATABASE_URL=postgresql://dailycoffee:dailycoffee@localhost:5433/dailycoffee
+
+# TypeScript 컴파일 체크
+npx tsc --noEmit
+
+# 개발 서버 (Docker 없이)
+pnpm dev
+```
+
+---
+
+## 5. 프론트엔드 직접 개발
+
+```bash
+cd src/frontend
+
+# 의존성 설치
+pnpm install
+
+# 환경 변수
+echo "NEXT_PUBLIC_API_URL=http://localhost:5002/api" > .env.local
+
+# 개발 서버
+pnpm dev  # http://localhost:3000
+```
+
+---
+
+## 6. DB 작업
+
+```bash
+# Prisma Studio (GUI) — 로컬에서 실행
+cd src/backend
+DATABASE_URL=postgresql://dailycoffee:dailycoffee@localhost:5433/dailycoffee npx prisma studio
+
+# 스키마 변경 후 push
+docker compose exec backend npx prisma db push
+
+# 시드 재실행 (기존 데이터 모두 삭제 후 재투입)
+docker compose exec backend npx ts-node prisma/seed.ts
+
+# DB 쉘 접속
+docker compose exec db psql -U dailycoffee -d dailycoffee
+```
+
+---
+
+## 7. 어드민 계정
+- 이메일: `admin@dailycoffee.co.kr`
+- 비밀번호: `admin1234`
+
+---
+
+## 8. 자주 쓰는 API 테스트
+
+```bash
+# 헬스체크
+curl http://localhost:5002/api/health
+
+# 로그인 (토큰 획득)
+TOKEN=$(curl -s -X POST http://localhost:5002/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@dailycoffee.co.kr","password":"admin1234"}' \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['accessToken'])")
+
+# 어드민 통계
+curl http://localhost:5002/api/admin/stats \
+  -H "Authorization: Bearer $TOKEN"
+
+# 상품 목록
+curl 'http://localhost:5002/api/products?limit=5'
+```
