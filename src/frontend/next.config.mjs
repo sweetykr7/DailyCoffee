@@ -1,12 +1,12 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '4000',
+        port: '4001',
       },
     ],
     unoptimized: true,
