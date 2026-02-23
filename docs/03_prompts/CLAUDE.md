@@ -120,6 +120,12 @@ If you're starting a new session:
 
 ## 💬 Communication Style
 
-- Commit messages: `type(scope): description` (e.g., `feat(cart): add quantity update`)
+- **커밋 메시지는 반드시 한국어로** 작성
+  - 형식: `타입(범위): 한글 설명`
+  - 예시: `feat(장바구니): 수량 변경 기능 추가`
+  - 예시: `feat(홈): 히어로 슬라이더 구현`
+  - 예시: `feat(상품): 상품 목록 및 필터 페이지 완성`
+  - 예시: `feat(인증): 로그인/회원가입 페이지 구현`
+  - 예시: `feat(인프라): Docker Compose 설정`
 - When stuck: document the problem in `docs/00_context/DECISIONS.md` before trying alternatives
 - When making a non-obvious decision: log it in DECISIONS.md
