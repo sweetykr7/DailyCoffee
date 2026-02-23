@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+      target: builder
+    command: pnpm dev
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000/api
+      - NODE_ENV=development
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+      target: builder
+    command: pnpm dev
+    volumes:
+      - ./src/backend:/app
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://dailycoffee:dailycoffee@db:5432/dailycoffee
+      - JWT_SECRET=dailycoffee-jwt-secret-key-dev
+      - JWT_REFRESH_SECRET=dailycoffee-refresh-secret-key-dev
+      - NODE_ENV=development
+      - PORT=4000

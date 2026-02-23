@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4000/api
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    ports:
+      - '4000:4000'
+    environment:
+      - DATABASE_URL=postgresql://dailycoffee:dailycoffee@db:5432/dailycoffee
+      - JWT_SECRET=dailycoffee-jwt-secret-key-2024
+      - JWT_REFRESH_SECRET=dailycoffee-refresh-secret-key-2024
+      - NODE_ENV=production
+      - PORT=4000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=dailycoffee
+      - POSTGRES_USER=dailycoffee
+      - POSTGRES_PASSWORD=dailycoffee
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
